@@ -15,7 +15,7 @@ export class DiscordUtility {
   static async handleNavigationInteraction(ctx: ComponentContext) {
     let state: NavigateState = StateParser.decodeNavigate(ctx.customID);
 
-    ctx.editOriginal(await this.getNewMessageContents(state));
+    ctx.editParent(await this.getNewMessageContents(state));
   }
 
   static async getNewMessageContents(
