@@ -1,9 +1,7 @@
-import { InteractionType } from "slash-create";
-import { Manga } from "./Manga";
+import { SeriesIdentifier } from "./Manga";
 
 export interface NavigateState {
-  platform: Required<string>;
-  series: Required<string>;
+  identifier: SeriesIdentifier;
   chapter: Required<string>;
   page: Required<number>;
   interactionType: Required<MangaInteractionType>;
@@ -19,9 +17,8 @@ export enum MangaInteractionType {
 }
 
 export class StateParser {
-
   static encodeNavigate(info: NavigateState, uid: string): string {
-    let customIdString = `${info.interactionType}|${info.platform}|${info.series}|${info.chapter}|${info.page}|${uid}`;
+    let customIdString = `${info.interactionType}|${info.identifier.platform}|${info.identifier.series}|${info.chapter}|${info.page}|${uid}`;
 
     if (customIdString.length > 100) {
       throw new Error("customIdString exceeds 100 characters");
@@ -39,8 +36,10 @@ export class StateParser {
 
     return {
       interactionType: parseInt(data[0]),
-      platform: data[1],
-      series: data[2],
+      identifier: {
+        platform: data[1],
+        series: data[2],
+      },
       chapter: data[3],
       page: parseInt(data[4]),
     };

@@ -4,19 +4,20 @@
   "description": "",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc -w --onSuccess \"func start\"",
+    "watch": "tsc-watch --onSuccess \"func start\"",
     "clean": "rimraf dist",
     "prestart": "npm run clean && npm run build",
     "start": "func start",
     "test": "echo \"No tests yet...\""
   },
   "dependencies": {
-    "slash-create": "^5.13.0"
+    "slash-create": "^5.13.0",
+    "@azure/functions": "^3.0.0"
   },
   "devDependencies": {
-    "@azure/functions": "^3.0.0",
     "@types/node": "^16.x",
     "rimraf": "^5.0.0",
+    "tsc-watch": "^6.0.4",
     "typescript": "^4.0.0"
   }
 }

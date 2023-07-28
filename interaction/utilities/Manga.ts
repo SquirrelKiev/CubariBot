@@ -9,8 +9,14 @@ export interface ChapterState {
   newPage: number;
 }
 
+export interface SeriesIdentifier {
+  platform: string;
+  series: string;
+}
+
+
 export class Manga {
-  slug: string;
+  identifier: SeriesIdentifier;
   title: string;
   description: string;
   author: string;
@@ -19,12 +25,11 @@ export class Manga {
   cover: string;
   chapters: Record<string, Chapter>;
   series_name: string;
-  platform: string;
 
   constructor(json: string, platform: string) {
     let data: any = JSON.parse(json);
 
-    this.slug = data.slug;
+    this.identifier = { platform, series: data.slug }
     this.title = data.title;
     this.description = data.description;
     this.author = data.author;
@@ -32,7 +37,6 @@ export class Manga {
     this.groups = data.groups;
     this.cover = data.cover;
     this.series_name = data.series_name;
-    this.platform = platform;
 
     this.chapters = Object.entries(data.chapters).reduce(
       (chapters, [key, value]) => {
@@ -77,7 +81,7 @@ export class Manga {
     while (true) {
       let totalChapterPages = (
         await this.chapters[chapterKeys[chapterIndex]].getImageSrcs(
-          getCacheKey(this.platform, this.slug, chapterKeys[chapterIndex])
+          getCacheKey(this.identifier, chapterKeys[chapterIndex])
         )
       ).length;
 
@@ -88,7 +92,7 @@ export class Manga {
         setChapterIndex(chapterIndex - 1);
         newPage += (
           await this.chapters[chapterKeys[chapterIndex]].getImageSrcs(
-            getCacheKey(this.platform, this.slug, chapterKeys[chapterIndex])
+            getCacheKey(this.identifier, chapterKeys[chapterIndex])
           )
         ).length;
       } else if (newPage > totalChapterPages) {
@@ -164,11 +168,10 @@ export class Chapter {
 }
 
 export function getCacheKey(
-  platform: string,
-  series: string,
+  identifier: SeriesIdentifier,
   chapter: string
 ): string {
-  return platform + series + chapter;
+  return identifier.platform + identifier.series + chapter;
 }
 
 export interface Image {

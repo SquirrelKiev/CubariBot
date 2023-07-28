@@ -8,7 +8,7 @@ import {
   CommandOptionType,
 } from "slash-create";
 import { StateParser, NavigateState, MangaInteractionType } from "../utilities/StateParser";
-import { Chapter, DEFAULT_CUBARI_URL, Manga } from "../utilities/Manga";
+import { Chapter, DEFAULT_CUBARI_URL, Manga, SeriesIdentifier } from "../utilities/Manga";
 import { DiscordUtility } from "../utilities/DiscordUtility";
 
 export default class PingCommand extends SlashCommand {
@@ -55,13 +55,14 @@ export default class PingCommand extends SlashCommand {
 
     let chapter: string = ctx.options.chapter;
     let page: number = ctx.options.page ?? PingCommand.defaultPage;
-    let platform: string = ctx.options.platform ?? PingCommand.defaultPlatform;
-    let series: string = ctx.options.series ?? PingCommand.defaultSeries;
+    let identifier: SeriesIdentifier = {
+      platform: ctx.options.platform ?? PingCommand.defaultPlatform,
+      series: ctx.options.series ?? PingCommand.defaultSeries
+    };
 
     ctx.send(await DiscordUtility.getNewMessageContents({
       interactionType: MangaInteractionType.None,
-      platform: platform,
-      series: series,
+      identifier: identifier,
       chapter: chapter,
       page: page
     }));
