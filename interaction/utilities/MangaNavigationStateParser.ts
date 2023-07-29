@@ -1,4 +1,4 @@
-import { SeriesIdentifier } from "./Manga";
+import { SeriesIdentifier } from "./MangaTypes";
 
 export interface NavigateState {
   identifier: SeriesIdentifier;
@@ -16,7 +16,7 @@ export enum MangaInteractionType {
   ForwardChapter,
 }
 
-export class StateParser {
+export class MangaNavigationStateParser {
   static encodeNavigate(info: NavigateState, uid: string): string {
     let customIdString = `${info.interactionType}|${info.identifier.platform}|${info.identifier.series}|${info.chapter}|${info.page}|${uid}`;
 

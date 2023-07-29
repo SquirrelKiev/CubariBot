@@ -1,6 +1,4 @@
-import { NavigateState } from "./StateParser";
-
-export const DEFAULT_CUBARI_URL: string = "https://cubari.moe";
+import { config } from "../../Config";
 
 var chapterCache: Record<string, string[]> = {};
 
@@ -150,7 +148,7 @@ export class Chapter {
     srcs: string[]
   ): Promise<string[]> {
     if (typeof group === "string") {
-      let req = await fetch(DEFAULT_CUBARI_URL + group);
+      let req = await fetch(config.cubariUrl + group);
       srcs = await this.getImageSrcFromGroup(await req.json(), srcs);
     } else if (isStringArray(group)) {
       srcs = srcs.concat(group as string[]);

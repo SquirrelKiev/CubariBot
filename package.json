@@ -11,8 +11,8 @@
     "test": "echo \"No tests yet...\""
   },
   "dependencies": {
-    "slash-create": "^5.13.0",
-    "@azure/functions": "^3.0.0"
+    "@azure/functions": "^3.0.0",
+    "slash-create": "^5.13.0"
   },
   "devDependencies": {
     "@types/node": "^16.x",

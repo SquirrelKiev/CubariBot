@@ -7,13 +7,16 @@ import {
 import {
   MangaInteractionType,
   NavigateState,
-  StateParser,
-} from "./StateParser";
-import { ChapterState, DEFAULT_CUBARI_URL, Manga, getCacheKey } from "./Manga";
+  MangaNavigationStateParser,
+} from "./MangaNavigationStateParser";
+import { ChapterState, Manga, getCacheKey } from "./MangaTypes";
+import { config } from "../../Config";
 
-export class DiscordUtility {
+export class MangaNavigationHandler {
   static async handleNavigationInteraction(ctx: ComponentContext) {
-    let state: NavigateState = StateParser.decodeNavigate(ctx.customID);
+    let state: NavigateState = MangaNavigationStateParser.decodeNavigate(
+      ctx.customID
+    );
 
     ctx.editParent(await this.getNewMessageContents(state));
   }
@@ -22,7 +25,7 @@ export class DiscordUtility {
     state: NavigateState
   ): Promise<MessageOptions> {
     let mangaGet: Response = await fetch(
-      `${DEFAULT_CUBARI_URL}/read/api/${encodeURIComponent(
+      `${config.cubariUrl}/read/api/${encodeURIComponent(
         state.identifier.platform
       )}/series/${encodeURIComponent(state.identifier.series)}/`
     );
@@ -33,7 +36,10 @@ export class DiscordUtility {
       };
     }
 
-    let manga: Manga = new Manga(await mangaGet.text(), state.identifier.platform);
+    let manga: Manga = new Manga(
+      await mangaGet.text(),
+      state.identifier.platform
+    );
     let chapter: string = state.chapter;
     let page: number = state.page;
 
@@ -77,16 +83,22 @@ export class DiscordUtility {
       return { content: "Invalid page. " + page };
     }
 
+    let imageUrl: string = pages[page - 1];
+
+    if (config.shouldProxyImages(state.identifier.platform)) {
+      imageUrl = `${config.proxyUrl}${encodeURIComponent(imageUrl)}`;
+    }
+
     return {
       embeds: [
         {
           title: chapterGroup.title,
-          url: `${DEFAULT_CUBARI_URL}/read/${encodeURIComponent(
+          url: `${config.cubariUrl}/read/${encodeURIComponent(
             state.identifier.platform
           )}/${encodeURIComponent(state.identifier.series)}/${chapter}/${page}`,
           description: `Chapter ${chapter} | Page ${page}/${pages.length}`,
           image: {
-            url: pages[page - 1],
+            url: imageUrl,
           },
           footer: {
             text: `${manga.series_name}, by ${manga.author}.`,
@@ -101,7 +113,7 @@ export class DiscordUtility {
               type: ComponentType.BUTTON,
               style: ButtonStyle.PRIMARY,
               label: "<<",
-              custom_id: StateParser.encodeNavigate(
+              custom_id: MangaNavigationStateParser.encodeNavigate(
                 {
                   interactionType: MangaInteractionType.BackChapter,
                   identifier: state.identifier,
@@ -118,7 +130,7 @@ export class DiscordUtility {
               type: ComponentType.BUTTON,
               style: ButtonStyle.PRIMARY,
               label: "<",
-              custom_id: StateParser.encodeNavigate(
+              custom_id: MangaNavigationStateParser.encodeNavigate(
                 {
                   interactionType: MangaInteractionType.BackPage,
                   identifier: state.identifier,
@@ -135,7 +147,7 @@ export class DiscordUtility {
               type: ComponentType.BUTTON,
               style: ButtonStyle.PRIMARY,
               label: ">",
-              custom_id: StateParser.encodeNavigate(
+              custom_id: MangaNavigationStateParser.encodeNavigate(
                 {
                   interactionType: MangaInteractionType.ForwardPage,
                   identifier: state.identifier,
@@ -152,7 +164,7 @@ export class DiscordUtility {
               type: ComponentType.BUTTON,
               style: ButtonStyle.PRIMARY,
               label: ">>",
-              custom_id: StateParser.encodeNavigate(
+              custom_id: MangaNavigationStateParser.encodeNavigate(
                 {
                   interactionType: MangaInteractionType.ForwardChapter,
                   identifier: state.identifier,

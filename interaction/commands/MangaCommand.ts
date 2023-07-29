@@ -1,21 +1,15 @@
 import {
   SlashCommand,
-  ComponentType,
-  ButtonStyle,
   CommandContext,
-  ComponentContext,
   SlashCreator,
   CommandOptionType,
 } from "slash-create";
-import { StateParser, NavigateState, MangaInteractionType } from "../utilities/StateParser";
-import { Chapter, DEFAULT_CUBARI_URL, Manga, SeriesIdentifier } from "../utilities/Manga";
-import { DiscordUtility } from "../utilities/DiscordUtility";
+import { MangaInteractionType } from "../utilities/MangaNavigationStateParser";
+import { MangaNavigationHandler } from "../utilities/MangaNavigationHandler";
+import { config } from "../../Config";
+import { parseMangaUrl } from "../utilities/ParseUrl";
 
-export default class PingCommand extends SlashCommand {
-  static defaultPage: number = 1;
-  static defaultPlatform: string = "mangasee";
-  static defaultSeries: string = "Oshi-no-Ko";
-
+export default class MangaCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
       name: "manga",
@@ -29,19 +23,13 @@ export default class PingCommand extends SlashCommand {
       {
         type: CommandOptionType.INTEGER,
         name: "page",
-        description: `Which page of that chapter? Default: Page ${PingCommand.defaultPage}`,
+        description: `Which page of that chapter? Default: Page ${config.defaultPage}`,
         required: false
       },
       {
         type: CommandOptionType.STRING,
-        name: "platform",
-        description: `The platform to get the series from. This can be figured from the URL. Default: ${PingCommand.defaultPlatform}`,
-        required: false
-      },
-      {
-        type: CommandOptionType.STRING,
-        name: "series",
-        description: `The series to get. This can be figured from the URL. Default: ${PingCommand.defaultSeries}`,
+        name: "url",
+        description: `The manga to get. Default: ${config.defaultManga}`,
         required: false
       }
       ],
@@ -53,14 +41,16 @@ export default class PingCommand extends SlashCommand {
   async run(ctx: CommandContext) {
     await ctx.defer();
 
-    let chapter: string = ctx.options.chapter;
-    let page: number = ctx.options.page ?? PingCommand.defaultPage;
-    let identifier: SeriesIdentifier = {
-      platform: ctx.options.platform ?? PingCommand.defaultPlatform,
-      series: ctx.options.series ?? PingCommand.defaultSeries
-    };
+    let identifier = parseMangaUrl(ctx.options.url ?? config.defaultManga);
 
-    ctx.send(await DiscordUtility.getNewMessageContents({
+    if(!identifier){
+      ctx.send("Invalid URL.");
+    }
+
+    let chapter: string = ctx.options.chapter;
+    let page: number = ctx.options.page ?? config.defaultPage;
+
+    ctx.send(await MangaNavigationHandler.getNewMessageContents({
       interactionType: MangaInteractionType.None,
       identifier: identifier,
       chapter: chapter,

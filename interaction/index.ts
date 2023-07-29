@@ -1,7 +1,7 @@
 import { AzureFunctionServer, SlashCreator } from "slash-create";
 import path = require("path");
-import { DiscordUtility } from "./utilities/DiscordUtility";
-import { MangaInteractionType, StateParser } from "./utilities/StateParser";
+import { MangaNavigationHandler } from "./utilities/MangaNavigationHandler";
+import { MangaInteractionType, MangaNavigationStateParser } from "./utilities/MangaNavigationStateParser";
 
 const creator = new SlashCreator({
   applicationID: process.env.DISCORD_APP_ID,
@@ -25,7 +25,7 @@ creator
       return;
     }
 
-    let interactionType: MangaInteractionType = StateParser.getInteractionType(
+    let interactionType: MangaInteractionType = MangaNavigationStateParser.getInteractionType(
       ctx.customID
     );
 
@@ -34,7 +34,7 @@ creator
       case MangaInteractionType.BackPage:
       case MangaInteractionType.ForwardChapter:
       case MangaInteractionType.ForwardPage:
-        DiscordUtility.handleNavigationInteraction(ctx);
+        MangaNavigationHandler.handleNavigationInteraction(ctx);
         break;
       case MangaInteractionType.Close:
         ctx.message.delete();
