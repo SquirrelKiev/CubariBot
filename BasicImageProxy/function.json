@@ -8,7 +8,7 @@
       "methods": [
         "get"
       ],
-      "route": "image.jpg"
+      "route": "proxy"
     },
     {
       "type": "http",

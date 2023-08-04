@@ -8,7 +8,7 @@ export const config = {
       proxyImages: true,
     },
   ],
-  proxyUrl: "https://kievscubaribot.azurewebsites.net/api/image.jpg?url=",
+  proxyUrl: "https://kievscubaribot.azurewebsites.net/api/proxy?url=",
 
   shouldProxyImages(platform: string): boolean {
     for (const customPlatform of this.customPlatformHandling) {
