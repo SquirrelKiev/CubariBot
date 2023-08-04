@@ -1,5 +1,5 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
-import { config } from "../Config";
+import { config } from "./Config";
 import { URL } from "url";
 
 const httpTrigger: AzureFunction = async function (
@@ -21,7 +21,7 @@ const httpTrigger: AzureFunction = async function (
 
   // Check the domain is allowed
   const urlObj = new URL(url);
-  if (!config.imageProxy.whitelistedDomains.includes(urlObj.hostname)) {
+  if (!config.whitelistedDomains.includes(urlObj.hostname)) {
     context.res = {
       status: 403,
       body: "The domain in the URL is not allowed.",
@@ -32,7 +32,7 @@ const httpTrigger: AzureFunction = async function (
   // Initialize AbortController to handle fetch timeouts
   const controller = new AbortController();
   const signal = controller.signal;
-  const timeoutId = setTimeout(() => controller.abort(), config.imageProxy.timeout); // Set timeout to 5 seconds
+  const timeoutId = setTimeout(() => controller.abort(), config.timeout); // Set timeout to 5 seconds
 
   try {
     // Fetch the image from the URL
@@ -43,7 +43,7 @@ const httpTrigger: AzureFunction = async function (
 
     // Check if the fetched resource is not too large
     const contentLength = response.headers.get("content-length");
-    if (contentLength && Number(contentLength) > config.imageProxy.maxImageSize) {
+    if (contentLength && Number(contentLength) > config.maxImageSize) {
       context.res = {
         status: 400,
         body: "Image size is too large.",

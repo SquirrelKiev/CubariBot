@@ -6,7 +6,7 @@ import {
 } from "slash-create";
 import { MangaInteractionType } from "../utilities/MangaNavigationStateParser";
 import { MangaNavigationHandler } from "../utilities/MangaNavigationHandler";
-import { config } from "../../Config";
+import { config } from "../Config";
 import { parseMangaUrl } from "../utilities/ParseUrl";
 
 export default class MangaCommand extends SlashCommand {

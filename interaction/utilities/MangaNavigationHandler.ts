@@ -10,7 +10,7 @@ import {
   MangaNavigationStateParser,
 } from "./MangaNavigationStateParser";
 import { ChapterState, Manga, getCacheKey } from "./MangaTypes";
-import { config } from "../../Config";
+import { config } from "../Config";
 
 export class MangaNavigationHandler {
   static async handleNavigationInteraction(ctx: ComponentContext) {
