@@ -8,6 +8,7 @@ import { MangaInteractionType } from "../utilities/MangaNavigationStateParser";
 import { MangaNavigationHandler } from "../utilities/MangaNavigationHandler";
 import { config } from "../Config";
 import { parseMangaUrl } from "../utilities/ParseUrl";
+import { DbManager } from "../utilities/DbManager";
 
 export default class MangaCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -41,7 +42,7 @@ export default class MangaCommand extends SlashCommand {
   async run(ctx: CommandContext) {
     await ctx.defer();
 
-    let identifier = parseMangaUrl(ctx.options.url ?? config.defaultManga);
+    let identifier = parseMangaUrl(ctx.options.url ?? (await DbManager.getInstance().getDefaultManga(ctx.guildID, ctx.channelID, ctx.user.id)));
 
     if(!identifier){
       ctx.send("Invalid URL.");

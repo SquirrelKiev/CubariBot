@@ -92,7 +92,7 @@ export class MangaNavigationHandler {
     return {
       embeds: [
         {
-          title: chapterGroup.title,
+          title: chapterGroup.title || chapter,
           url: `${config.cubariUrl}/read/${encodeURIComponent(
             state.identifier.platform
           )}/${encodeURIComponent(state.identifier.series)}/${chapter}/${page}`,

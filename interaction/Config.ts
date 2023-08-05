@@ -6,9 +6,9 @@ export const config = {
     {
       platform: "mangadex",
       proxyImages: true,
-    },
+    }
   ],
-  proxyUrl: "https://kievscubaribot.azurewebsites.net/api/proxy?url=",
+  proxyUrl: "https://dev-tunnel.squirrelkiev.co.uk/api/proxy.png?url=",
 
   shouldProxyImages(platform: string): boolean {
     for (const customPlatform of this.customPlatformHandling) {

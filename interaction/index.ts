@@ -1,20 +1,21 @@
 import { AzureFunctionServer, SlashCreator } from "slash-create";
 import path = require("path");
 import { MangaNavigationHandler } from "./utilities/MangaNavigationHandler";
-import { MangaInteractionType, MangaNavigationStateParser } from "./utilities/MangaNavigationStateParser";
+import {
+  MangaInteractionType,
+  MangaNavigationStateParser,
+} from "./utilities/MangaNavigationStateParser";
 
 const creator = new SlashCreator({
   applicationID: process.env.DISCORD_APP_ID,
   publicKey: process.env.DISCORD_PUBLIC_KEY,
   token: process.env.DISCORD_BOT_TOKEN,
+  
 });
 
 creator
-  // The first argument is required, but the second argument is the "target" or the name of the export.
-  // By default, the target is "interactions".
   .withServer(new AzureFunctionServer(module.exports))
   .registerCommandsIn(path.join(__dirname, "commands"))
-  // Syncing the commands each time the function is executed is wasting computing time
   .syncCommands()
   .on("componentInteraction", (ctx) => {
     if (ctx.message.interaction.user.id !== ctx.user.id) {
@@ -25,9 +26,8 @@ creator
       return;
     }
 
-    let interactionType: MangaInteractionType = MangaNavigationStateParser.getInteractionType(
-      ctx.customID
-    );
+    let interactionType: MangaInteractionType =
+      MangaNavigationStateParser.getInteractionType(ctx.customID);
 
     switch (interactionType) {
       case MangaInteractionType.BackChapter:

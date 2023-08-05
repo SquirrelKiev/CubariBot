@@ -12,7 +12,6 @@ export interface SeriesIdentifier {
   series: string;
 }
 
-
 export class Manga {
   identifier: SeriesIdentifier;
   title: string;
@@ -27,7 +26,7 @@ export class Manga {
   constructor(json: string, platform: string) {
     let data: any = JSON.parse(json);
 
-    this.identifier = { platform, series: data.slug }
+    this.identifier = { platform, series: data.slug };
     this.title = data.title;
     this.description = data.description;
     this.author = data.author;
@@ -51,7 +50,20 @@ export class Manga {
     deltaChapters: number,
     deltaPages: number
   ): Promise<ChapterState> {
-    let chapterKeys: string[] = Object.keys(this.chapters);
+    let chapterKeysUnsorted: string[] = Object.keys(this.chapters).sort();
+
+    let numbers = chapterKeysUnsorted.filter(
+      (item) => !isNaN(parseFloat(item))
+    );
+    // not sure if this crops up but im not taking any chances
+    let nonNumbers = chapterKeysUnsorted.filter((item) =>
+      isNaN(parseFloat(item))
+    );
+
+    numbers.sort((a, b) => parseFloat(a) - parseFloat(b));
+    nonNumbers.sort();
+
+    let chapterKeys = [...numbers, ...nonNumbers];
 
     let chapterIndex = chapterKeys.findIndex(
       (chapter) => chapter === currentChapter
