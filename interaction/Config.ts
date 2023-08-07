@@ -8,8 +8,7 @@ export const config = {
       proxyImages: true,
     }
   ],
-  proxyUrl: "https://dev-tunnel.squirrelkiev.co.uk/api/proxy.png?url=",
-
+  proxyUrl: process.env.PROXY_URL,
   shouldProxyImages(platform: string): boolean {
     for (const customPlatform of this.customPlatformHandling) {
       if (customPlatform.platform === platform && customPlatform.proxyImages) {
