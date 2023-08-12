@@ -1,5 +1,5 @@
 import { URL } from "url";
-import { SeriesIdentifier } from "./MangaTypes";
+import { SeriesIdentifier } from "../manga/MangaTypes";
 
 // base regex is courtesy of https://github.com/subject-f/cubarimoe/blob/develop/static_global/js/main.js
 export function parseMangaUrl(url: string): SeriesIdentifier | undefined {

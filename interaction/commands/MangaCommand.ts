@@ -4,11 +4,11 @@ import {
   SlashCreator,
   CommandOptionType,
 } from "slash-create";
-import { MangaInteractionType } from "../utilities/MangaNavigationStateParser";
-import { MangaNavigationHandler } from "../utilities/MangaNavigationHandler";
+import { MangaInteractionType } from "../manga/MangaNavigationStateParser";
+import { MangaNavigationHandler } from "../manga/MangaNavigationHandler";
 import { config } from "../Config";
-import { parseMangaUrl } from "../utilities/ParseUrl";
-import { DbManager } from "../utilities/DbManager";
+import { parseMangaUrl } from "../misc/ParseUrl";
+import { DbManager } from "../database/DbManager";
 
 export default class MangaCommand extends SlashCommand {
   constructor(creator: SlashCreator) {

@@ -10,7 +10,6 @@ const httpTrigger: AzureFunction = async function (
 
   context.log(`Image proxy attempt started! url: ${url}`);
 
-  // Check if a url was passed
   if (!url) {
     context.res = {
       status: 400,
@@ -19,29 +18,25 @@ const httpTrigger: AzureFunction = async function (
     return;
   }
 
-  // Check the domain is allowed
   const urlObj = new URL(url);
   if (!config.whitelistedDomains.includes(urlObj.hostname)) {
     context.res = {
       status: 403,
-      body: "The domain in the URL is not allowed.",
+      body: "The domain in the URL is not whitelisted.",
     };
     return;
   }
 
-  // Initialize AbortController to handle fetch timeouts
+  // for timeouts
   const controller = new AbortController();
   const signal = controller.signal;
-  const timeoutId = setTimeout(() => controller.abort(), config.timeout); // Set timeout to 5 seconds
+  const timeoutId = setTimeout(() => controller.abort(), config.timeout);
 
   try {
-    // Fetch the image from the URL
     const response = await fetch(url, { signal });
 
-    // Clear timeout if the response is received within the time limit
     clearTimeout(timeoutId);
 
-    // Check if the fetched resource is not too large
     const contentLength = response.headers.get("content-length");
     if (contentLength && Number(contentLength) > config.maxImageSize) {
       context.res = {
@@ -51,11 +46,9 @@ const httpTrigger: AzureFunction = async function (
       return;
     }
 
-    // Read the image as a Buffer
     const imageBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(imageBuffer);
 
-    // Check if the content is actually an image
     const contentType = response.headers.get('content-type');
     if (!contentType || !contentType.startsWith("image")) {
       context.res = {
@@ -66,7 +59,7 @@ const httpTrigger: AzureFunction = async function (
     }
 
     context.res = {
-      // status: 200, /* Defaults to 200 */
+      // status: 200
       body: buffer,
       headers: {
         "Content-Type": contentType,
