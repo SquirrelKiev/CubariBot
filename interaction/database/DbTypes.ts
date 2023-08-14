@@ -17,6 +17,6 @@ export class GuildPrefs extends Prefs {
   }
 }
 
-export class UserPrefs extends Prefs { }
+export class UserPrefs extends Prefs {}
 
-export class ChannelPrefs extends Prefs { }
+export class ChannelPrefs extends Prefs {}

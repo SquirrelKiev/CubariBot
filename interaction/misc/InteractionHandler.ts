@@ -1,5 +1,8 @@
 import { ComponentContext } from "slash-create";
-import { MangaInteractionType as InteractionType, MangaNavigationStateParser as InteractionStateParser } from "../manga/MangaNavigationStateParser";
+import {
+  MangaInteractionType as InteractionType,
+  MangaNavigationStateParser as InteractionStateParser,
+} from "../manga/MangaNavigationStateParser";
 import { MangaNavigationHandler } from "../manga/MangaNavigationHandler";
 
 export default function interactionHandler(ctx: ComponentContext) {

@@ -49,7 +49,7 @@ const httpTrigger: AzureFunction = async function (
     const imageBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(imageBuffer);
 
-    const contentType = response.headers.get('content-type');
+    const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.startsWith("image")) {
       context.res = {
         status: 400,
@@ -67,7 +67,7 @@ const httpTrigger: AzureFunction = async function (
       isRaw: true,
     };
   } catch (err) {
-    if (err.name === 'AbortError') {
+    if (err.name === "AbortError") {
       context.res = {
         status: 408,
         body: "Request timed out.",

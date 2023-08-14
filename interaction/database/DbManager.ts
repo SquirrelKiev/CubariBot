@@ -19,15 +19,27 @@ export class DbManager {
   }
 
   public async getGuildPrefs(id: string) {
-    return this.getPrefs<GuildPrefs>(id, "guild-prefs", (partial) => new GuildPrefs(partial));
+    return this.getPrefs<GuildPrefs>(
+      id,
+      "guild-prefs",
+      (partial) => new GuildPrefs(partial)
+    );
   }
 
   public async getChannelPrefs(id: string) {
-    return this.getPrefs<ChannelPrefs>(id, "channel-prefs", (partial) => new ChannelPrefs(partial));
+    return this.getPrefs<ChannelPrefs>(
+      id,
+      "channel-prefs",
+      (partial) => new ChannelPrefs(partial)
+    );
   }
 
   public async getUserPrefs(id: string) {
-    return this.getPrefs<UserPrefs>(id, "user-prefs", (partial) => new UserPrefs(partial));
+    return this.getPrefs<UserPrefs>(
+      id,
+      "user-prefs",
+      (partial) => new UserPrefs(partial)
+    );
   }
 
   public async setGuildPrefs(id: string, partial: Partial<GuildPrefs>) {
@@ -46,7 +58,7 @@ export class DbManager {
     userId: string
   ): Promise<string> {
     const userPrefs = await this.getUserPrefs(userId);
-    
+
     if (userPrefs.defaultManga) {
       return userPrefs.defaultManga;
     }
@@ -60,7 +72,6 @@ export class DbManager {
     const guildPrefs = await this.getGuildPrefs(guildId);
     return guildPrefs.defaultManga;
   }
-
 
   private async setPrefs<T extends Prefs>(
     guildId: string,

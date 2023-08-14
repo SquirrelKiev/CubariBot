@@ -6,7 +6,7 @@ export const config = {
     {
       platform: "mangadex",
       proxyImages: true,
-    }
+    },
   ],
   proxyUrl: process.env.PROXY_URL,
   shouldProxyImages(platform: string): boolean {
