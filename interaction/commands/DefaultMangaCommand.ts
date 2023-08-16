@@ -5,7 +5,8 @@ import {
   CommandOptionType,
 } from "slash-create";
 import { DbManager } from "../database/DbManager";
-import { Prefs } from "../database/DbTypes";
+import { parseMangaUrl } from "../misc/ParseUrl";
+import { Channel } from "slash-create/lib/structures/channel";
 
 export default class DefaultMangaCommand extends SlashCommand {
   private dbManager: DbManager;
@@ -13,7 +14,7 @@ export default class DefaultMangaCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
       name: "default-manga",
-      description: "configuring the default manga",
+      description: "Gets the current default manga.",
       options: [
         {
           type: CommandOptionType.SUB_COMMAND,
@@ -76,20 +77,38 @@ export default class DefaultMangaCommand extends SlashCommand {
     }
 
     let result = null;
+    let url: string | null = ctx.options[ctx.subcommands[0]]["url"];
+    let set: boolean = false;
+
+    if (url && url !== "none") {
+      const parsed = parseMangaUrl(url);
+      if (parsed) {
+        url = `${encodeURIComponent(parsed.platform)}/${encodeURIComponent(parsed.series)}`;
+        set = true;
+      } else {
+        ctx.send("Not a valid link to a manga.");
+        return;
+      }
+    }
+
     switch (ctx.subcommands[0]) {
       case "server":
         result = await this.handleConfig(
           ctx.guildID,
           "defaultManga",
-          ctx.options[ctx.subcommands[0]]["url"],
+          url,
           "server"
         );
         break;
       case "channel":
+        const subcommandName = ctx.subcommands[0];
+        const subcommandData = ctx.options[subcommandName];
+        const channelId = subcommandData["channel"];
+
         result = await this.handleConfig(
-          ctx.channelID,
+          channelId,
           "defaultManga",
-          ctx.options[ctx.subcommands[0]]["url"],
+          url,
           "channel"
         );
         break;
@@ -97,68 +116,59 @@ export default class DefaultMangaCommand extends SlashCommand {
         result = await this.handleConfig(
           ctx.user.id,
           "defaultManga",
-          ctx.options[ctx.subcommands[0]]["url"],
+          url,
           "user"
         );
         break;
     }
 
-    // Send the result of the operation back to the channel
-    if (result instanceof Error) {
-      ctx.send(`Error: ${result.message}. Please try again later.`);
-    } else {
-      ctx.send(result);
-    }
+    if (result === null) {
+      ctx.send("Not set.");
+  } else if (set) {
+      ctx.send(`Successfully set the ${ctx.subcommands[0]}'s default manga to \`${result}\``);
+  } else {
+      ctx.send(`the ${ctx.subcommands[0]}'s default manga is \`${result}\``);
+  }
+  
   }
 
   async handleConfig(
     id: string,
     key: string,
-    value: string,
+    value: any,
     type: "server" | "channel" | "user"
-  ): Promise<string> {
-    let prefs: Prefs;
+  ): Promise<string | null> {
+    const typeFunctionMap = {
+      server: {
+        get: this.dbManager.getGuildPrefs.bind(this.dbManager),
+        set: this.dbManager.setGuildPrefs.bind(this.dbManager),
+      },
+      channel: {
+        get: this.dbManager.getChannelPrefs.bind(this.dbManager),
+        set: this.dbManager.setChannelPrefs.bind(this.dbManager),
+      },
+      user: {
+        get: this.dbManager.getUserPrefs.bind(this.dbManager),
+        set: this.dbManager.setUserPrefs.bind(this.dbManager),
+      },
+    };
 
-    switch (type) {
-      case "server":
-        prefs = await this.dbManager.getGuildPrefs(id);
-        break;
-
-      case "channel":
-        prefs = await this.dbManager.getChannelPrefs(id);
-        break;
-
-      case "user":
-        prefs = await this.dbManager.getUserPrefs(id);
-        break;
-
-      default:
-        throw new Error("not a valid type!");
+    if (!typeFunctionMap[type]) {
+      throw new Error("not a valid type!");
     }
 
+    let prefs = await typeFunctionMap[type].get(id);
+
     if (value) {
-      switch (type) {
-        case "server":
-          await this.dbManager.setGuildPrefs(id, { [key]: value });
-          break;
+      let modifiedValue = value === "none" ? null : value;
 
-        case "channel":
-          await this.dbManager.setChannelPrefs(id, { [key]: value });
-          break;
-
-        case "user":
-          await this.dbManager.setUserPrefs(id, { [key]: value });
-          break;
-
-        default:
-          throw new Error("not a valid type!");
-      }
-      return `Successfully set ${key} to ${value}`;
+      await typeFunctionMap[type].set(id, { [key]: modifiedValue });
+      return value;
     } else {
       if (key in prefs && prefs[key] !== null) {
-        return `The value of ${key} is \`${prefs[key]}\``;
+        return prefs[key];
       } else {
-        return `No value set for \`${key}\``;
+        return null;
       }
     }
   }

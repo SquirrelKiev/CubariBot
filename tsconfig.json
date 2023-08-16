@@ -4,6 +4,7 @@
     "target": "ESNext",
     "outDir": "dist",
     "rootDir": ".",
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "strict": false

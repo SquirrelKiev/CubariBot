@@ -9,8 +9,8 @@ import {
   NavigateState,
   MangaNavigationStateParser,
 } from "./MangaNavigationStateParser";
-import { ChapterState, Manga, getCacheKey } from "./MangaTypes";
-import { config } from "../Config";
+import { ChapterState } from "./MangaTypes";
+import CubariApi from "../misc/CubariApi";
 
 export class MangaNavigationHandler {
   static async handleNavigationInteraction(ctx: ComponentContext) {
@@ -24,22 +24,8 @@ export class MangaNavigationHandler {
   static async getNewMessageContents(
     state: NavigateState
   ): Promise<MessageOptions> {
-    let mangaGet: Response = await fetch(
-      `${config.cubariUrl}/read/api/${encodeURIComponent(
-        state.identifier.platform
-      )}/series/${encodeURIComponent(state.identifier.series)}/`
-    );
+    let manga = await CubariApi.getManga(state.identifier);
 
-    if (mangaGet.status !== 200) {
-      return {
-        content: `${mangaGet.status} - assuming the manga doesnt exist?`,
-      };
-    }
-
-    let manga: Manga = new Manga(
-      await mangaGet.text(),
-      state.identifier.platform
-    );
     let chapter: string = state.chapter;
     let page: number = state.page;
 
@@ -54,51 +40,35 @@ export class MangaNavigationHandler {
         break;
       case MangaInteractionType.BackChapter:
         chapState = await manga.navigate(chapter, page, -1, 0);
-        chapter = chapState.newChapter;
-        page = chapState.newPage;
         break;
       case MangaInteractionType.BackPage:
         chapState = await manga.navigate(chapter, page, 0, -1);
-        chapter = chapState.newChapter;
-        page = chapState.newPage;
         break;
       case MangaInteractionType.ForwardPage:
         chapState = await manga.navigate(chapter, page, 0, 1);
-        chapter = chapState.newChapter;
-        page = chapState.newPage;
         break;
       case MangaInteractionType.ForwardChapter:
         chapState = await manga.navigate(chapter, page, 1, 0);
-        chapter = chapState.newChapter;
-        page = chapState.newPage;
         break;
     }
 
-    let chapterGroup = manga.chapters[chapter];
-    let pages: string[] = await chapterGroup.getImageSrcs(
-      getCacheKey(state.identifier, chapter)
-    );
-
-    if (page - 1 > pages.length - 1 || page - 1 < 0) {
-      return { content: "Invalid page. " + page };
+    if (chapState) {
+      chapter = chapState.newChapter;
+      page = chapState.newPage;
     }
 
-    let imageUrl: string = pages[page - 1];
-
-    if (config.shouldProxyImages(state.identifier.platform)) {
-      imageUrl = `${config.proxyUrl}${encodeURIComponent(imageUrl)}`;
-    }
+    let chapterData = manga.chapters[chapter];
+    const pages = await CubariApi.getPages(manga, chapterData);
+    const pageSrc = CubariApi.getPageSrc(manga, pages, page);
 
     return {
       embeds: [
         {
-          title: chapterGroup.title || chapter,
-          url: `${config.cubariUrl}/read/${encodeURIComponent(
-            state.identifier.platform
-          )}/${encodeURIComponent(state.identifier.series)}/${chapter}/${page}`,
+          title: chapterData.title || chapter,
+          url: manga.getCubariUrl(chapter, page),
           description: `Chapter ${chapter} | Page ${page}/${pages.length}`,
           image: {
-            url: imageUrl,
+            url: pageSrc,
           },
           footer: {
             text: `${manga.series_name}, by ${manga.author}.`,

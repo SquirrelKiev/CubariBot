@@ -12,4 +12,8 @@ creator
   .withServer(new AzureFunctionServer(module.exports))
   .registerCommandsIn(path.join(__dirname, "commands"))
   .syncCommands()
-  .on("componentInteraction", interactionHandler);
+  .on("componentInteraction", interactionHandler)
+  .on("commandError", (command, err, ctx) => {
+    ctx.send(`Looks like something goofed. \`${err.message}\``)
+    console.error(err);
+  });

@@ -13,6 +13,11 @@ export interface SeriesIdentifier {
 }
 
 export class Manga {
+  getCubariUrl(chapter: string, page: number): string {
+    return `${config.cubariUrl}/read/${encodeURIComponent(
+      this.identifier.platform
+    )}/${encodeURIComponent(this.identifier.series)}/${chapter}/${page}`;
+  }
   identifier: SeriesIdentifier;
   title: string;
   description: string;
@@ -37,7 +42,7 @@ export class Manga {
 
     this.chapters = Object.entries(data.chapters).reduce(
       (chapters, [key, value]) => {
-        chapters[key] = new Chapter(value);
+        chapters[key] = new Chapter(value, key);
         return chapters;
       },
       {} as Record<string, Chapter>
@@ -123,13 +128,15 @@ export class Manga {
 export class Chapter {
   volume: string | null;
   title: string;
+  slug: string;
   groups: Record<string, string | string[] | Image[]>;
   release_date?: Record<string, number>;
   last_updated?: number;
 
-  constructor(data: any) {
+  constructor(data: any, slug: string) {
     this.volume = data.volume;
     this.title = data.title;
+    this.slug = slug;
     this.groups = data.groups;
     this.release_date = data.release_date;
     this.last_updated = data.last_updated;

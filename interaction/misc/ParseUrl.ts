@@ -2,7 +2,7 @@ import { URL } from "url";
 import { SeriesIdentifier } from "../manga/MangaTypes";
 
 // base regex is courtesy of https://github.com/subject-f/cubarimoe/blob/develop/static_global/js/main.js
-export function parseMangaUrl(url: string): SeriesIdentifier | undefined {
+export function parseMangaUrl(url: string): SeriesIdentifier | null {
   let series: string | undefined;
   let platform: string | undefined;
 
@@ -65,7 +65,7 @@ export function parseMangaUrl(url: string): SeriesIdentifier | undefined {
       series = split[1];
     }
   } else {
-    return undefined;
+    return null;
   }
 
   return { platform, series: series };

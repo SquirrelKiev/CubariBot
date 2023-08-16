@@ -2,13 +2,14 @@
   "name": "cubaribot",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc-watch --onSuccess \"npm run start\"",
+    "dev": "tsc-watch --onSuccess \"npm run start\"",
     "clean": "rimraf dist",
     "prestart": "npm run clean && npm run build",
     "start": "func start"
   },
   "dependencies": {
     "@azure/functions": "^3.0.0",
+    "mangadex-full-api": "^5.12.1",
     "mongodb": "^5.7.0",
     "slash-create": "^5.13.0"
   },

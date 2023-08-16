@@ -98,8 +98,8 @@ export class DbManager {
     let prefs: T;
 
     if (!prefsDocument) {
-      prefs = factory({ id: id } as Partial<T>);
-      await this.setPrefs(id, collectionName, prefs);
+      prefs = factory({ id } as Partial<T>);
+      // await this.setPrefs(id, collectionName, prefs); // sounds costly
     } else {
       // shh linter be quiet
       prefs = factory(prefsDocument as unknown as Partial<T>);
