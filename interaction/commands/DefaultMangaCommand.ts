@@ -6,7 +6,6 @@ import {
 } from "slash-create";
 import { DbManager } from "../database/DbManager";
 import { parseMangaUrl } from "../misc/ParseUrl";
-import { Channel } from "slash-create/lib/structures/channel";
 
 export default class DefaultMangaCommand extends SlashCommand {
   private dbManager: DbManager;
@@ -83,7 +82,9 @@ export default class DefaultMangaCommand extends SlashCommand {
     if (url && url !== "none") {
       const parsed = parseMangaUrl(url);
       if (parsed) {
-        url = `${encodeURIComponent(parsed.platform)}/${encodeURIComponent(parsed.series)}`;
+        url = `${encodeURIComponent(parsed.platform)}/${encodeURIComponent(
+          parsed.series
+        )}`;
         set = true;
       } else {
         ctx.send("Not a valid link to a manga.");
@@ -124,12 +125,13 @@ export default class DefaultMangaCommand extends SlashCommand {
 
     if (result === null) {
       ctx.send("Not set.");
-  } else if (set) {
-      ctx.send(`Successfully set the ${ctx.subcommands[0]}'s default manga to \`${result}\``);
-  } else {
+    } else if (set) {
+      ctx.send(
+        `Successfully set the ${ctx.subcommands[0]}'s default manga to \`${result}\``
+      );
+    } else {
       ctx.send(`the ${ctx.subcommands[0]}'s default manga is \`${result}\``);
-  }
-  
+    }
   }
 
   async handleConfig(

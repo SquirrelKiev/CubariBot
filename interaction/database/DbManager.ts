@@ -1,5 +1,6 @@
 import { Db, MongoClient } from "mongodb";
 import { ChannelPrefs, GuildPrefs, Prefs, UserPrefs } from "./DbTypes";
+import { config } from "../Config";
 
 export class DbManager {
   private static instance: DbManager;
@@ -13,7 +14,7 @@ export class DbManager {
       this.instance.client = new MongoClient(
         process.env.MONGODB_CONNECTION_STRING
       );
-      this.instance.db = this.instance.client.db("prefs");
+      this.instance.db = this.instance.client.db(config.dbName);
     }
     return this.instance;
   }
@@ -21,7 +22,7 @@ export class DbManager {
   public async getGuildPrefs(id: string) {
     return this.getPrefs<GuildPrefs>(
       id,
-      "guild-prefs",
+      config.guildPrefsCol,
       (partial) => new GuildPrefs(partial)
     );
   }
@@ -29,7 +30,7 @@ export class DbManager {
   public async getChannelPrefs(id: string) {
     return this.getPrefs<ChannelPrefs>(
       id,
-      "channel-prefs",
+      config.channelPrefsCol,
       (partial) => new ChannelPrefs(partial)
     );
   }
@@ -37,19 +38,19 @@ export class DbManager {
   public async getUserPrefs(id: string) {
     return this.getPrefs<UserPrefs>(
       id,
-      "user-prefs",
+      config.userPrefsCol,
       (partial) => new UserPrefs(partial)
     );
   }
 
   public async setGuildPrefs(id: string, partial: Partial<GuildPrefs>) {
-    return this.setPrefs(id, "guild-prefs", partial);
+    return this.setPrefs(id, config.guildPrefsCol, partial);
   }
   public async setChannelPrefs(id: string, partial: Partial<ChannelPrefs>) {
-    return this.setPrefs(id, "channel-prefs", partial);
+    return this.setPrefs(id, config.channelPrefsCol, partial);
   }
   public async setUserPrefs(id: string, partial: Partial<UserPrefs>) {
-    return this.setPrefs(id, "user-prefs", partial);
+    return this.setPrefs(id, config.userPrefsCol, partial);
   }
 
   public async getDefaultManga(
@@ -74,14 +75,14 @@ export class DbManager {
   }
 
   private async setPrefs<T extends Prefs>(
-    guildId: string,
+    id: string,
     collectionName: string,
     pref: Partial<T>
   ): Promise<void> {
     const collection = this.db.collection(collectionName);
 
     await collection.updateOne(
-      { id: guildId },
+      { id: id },
       { $set: pref },
       { upsert: true }
     );
@@ -99,7 +100,6 @@ export class DbManager {
 
     if (!prefsDocument) {
       prefs = factory({ id } as Partial<T>);
-      // await this.setPrefs(id, collectionName, prefs); // sounds costly
     } else {
       // shh linter be quiet
       prefs = factory(prefsDocument as unknown as Partial<T>);
