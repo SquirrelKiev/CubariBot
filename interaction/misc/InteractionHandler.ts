@@ -1,8 +1,8 @@
 import { ComponentContext } from "slash-create";
 import {
-  MangaInteractionType as InteractionType,
-  MangaNavigationStateParser as InteractionStateParser,
-} from "../manga/MangaNavigationStateParser";
+  InteractionType,
+  InteractionIdSerializer,
+} from "../manga/InteractionIdSerializer";
 import { MangaNavigationHandler } from "../manga/MangaNavigationHandler";
 
 export default function interactionHandler(ctx: ComponentContext) {
@@ -15,13 +15,13 @@ export default function interactionHandler(ctx: ComponentContext) {
   }
 
   let interactionType: InteractionType =
-    InteractionStateParser.getInteractionType(ctx.customID);
+    InteractionIdSerializer.getInteractionType(ctx.customID);
 
   switch (interactionType) {
-    case InteractionType.BackChapter:
-    case InteractionType.BackPage:
-    case InteractionType.ForwardChapter:
-    case InteractionType.ForwardPage:
+    case InteractionType.Manga_BackChapter:
+    case InteractionType.Manga_BackPage:
+    case InteractionType.Manga_ForwardChapter:
+    case InteractionType.Manga_ForwardPage:
       MangaNavigationHandler.handleNavigationInteraction(ctx);
       break;
     case InteractionType.Close:

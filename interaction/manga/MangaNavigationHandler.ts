@@ -5,16 +5,16 @@ import {
   MessageOptions,
 } from "slash-create";
 import {
-  MangaInteractionType,
+  InteractionType as InteractionType,
   NavigateState,
-  MangaNavigationStateParser,
-} from "./MangaNavigationStateParser";
+  InteractionIdSerializer,
+} from "./InteractionIdSerializer";
 import { ChapterState } from "./MangaTypes";
 import CubariApi from "../misc/CubariApi";
 
 export class MangaNavigationHandler {
   static async handleNavigationInteraction(ctx: ComponentContext) {
-    let state: NavigateState = MangaNavigationStateParser.decodeNavigate(
+    let state: NavigateState = InteractionIdSerializer.decodeNavigate(
       ctx.customID
     );
 
@@ -26,8 +26,8 @@ export class MangaNavigationHandler {
   ): Promise<MessageOptions> {
     let manga = await CubariApi.getManga(state.identifier);
 
-    let chapter: string = state.chapter;
-    let page: number = state.page;
+    let chapter: string = state.chapter ?? manga.getSortedChapterKeys()[0];
+    let page: number = state.page ?? 1;
 
     if (chapter in manga.chapters === false) {
       return { content: "404 - Chapter not found." };
@@ -36,20 +36,22 @@ export class MangaNavigationHandler {
     let chapState: ChapterState;
 
     switch (state.interactionType) {
-      case MangaInteractionType.None:
+      case InteractionType.Manga_Open:
         break;
-      case MangaInteractionType.BackChapter:
+      case InteractionType.Manga_BackChapter:
         chapState = await manga.navigate(chapter, page, -1, 0);
         break;
-      case MangaInteractionType.BackPage:
+      case InteractionType.Manga_BackPage:
         chapState = await manga.navigate(chapter, page, 0, -1);
         break;
-      case MangaInteractionType.ForwardPage:
+      case InteractionType.Manga_ForwardPage:
         chapState = await manga.navigate(chapter, page, 0, 1);
         break;
-      case MangaInteractionType.ForwardChapter:
+      case InteractionType.Manga_ForwardChapter:
         chapState = await manga.navigate(chapter, page, 1, 0);
         break;
+      default:
+        throw new Error("InteractionType not implemented!");
     }
 
     if (chapState) {
@@ -83,9 +85,9 @@ export class MangaNavigationHandler {
               type: ComponentType.BUTTON,
               style: ButtonStyle.PRIMARY,
               label: "<<",
-              custom_id: MangaNavigationStateParser.encodeNavigate(
+              custom_id: InteractionIdSerializer.encodeNavigate(
                 {
-                  interactionType: MangaInteractionType.BackChapter,
+                  interactionType: InteractionType.Manga_BackChapter,
                   identifier: state.identifier,
                   page: page,
                   chapter: chapter,
@@ -100,9 +102,9 @@ export class MangaNavigationHandler {
               type: ComponentType.BUTTON,
               style: ButtonStyle.PRIMARY,
               label: "<",
-              custom_id: MangaNavigationStateParser.encodeNavigate(
+              custom_id: InteractionIdSerializer.encodeNavigate(
                 {
-                  interactionType: MangaInteractionType.BackPage,
+                  interactionType: InteractionType.Manga_BackPage,
                   identifier: state.identifier,
                   page: page,
                   chapter: chapter,
@@ -117,9 +119,9 @@ export class MangaNavigationHandler {
               type: ComponentType.BUTTON,
               style: ButtonStyle.PRIMARY,
               label: ">",
-              custom_id: MangaNavigationStateParser.encodeNavigate(
+              custom_id: InteractionIdSerializer.encodeNavigate(
                 {
-                  interactionType: MangaInteractionType.ForwardPage,
+                  interactionType: InteractionType.Manga_ForwardPage,
                   identifier: state.identifier,
                   page: page,
                   chapter: chapter,
@@ -134,9 +136,9 @@ export class MangaNavigationHandler {
               type: ComponentType.BUTTON,
               style: ButtonStyle.PRIMARY,
               label: ">>",
-              custom_id: MangaNavigationStateParser.encodeNavigate(
+              custom_id: InteractionIdSerializer.encodeNavigate(
                 {
-                  interactionType: MangaInteractionType.ForwardChapter,
+                  interactionType: InteractionType.Manga_ForwardChapter,
                   identifier: state.identifier,
                   page: page,
                   chapter: chapter,
@@ -151,7 +153,7 @@ export class MangaNavigationHandler {
               type: ComponentType.BUTTON,
               style: ButtonStyle.DESTRUCTIVE,
               label: "X",
-              custom_id: MangaInteractionType.Close.toString(),
+              custom_id: InteractionType.Close.toString(),
             },
           ],
         },
@@ -159,3 +161,4 @@ export class MangaNavigationHandler {
     };
   }
 }
+

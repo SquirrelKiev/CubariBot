@@ -14,6 +14,12 @@ creator
   .syncCommands()
   .on("componentInteraction", interactionHandler)
   .on("commandError", (command, err, ctx) => {
-    ctx.send(`Looks like something goofed. \`${err.message}\``)
     console.error(err);
+    ctx.send(
+      `Looks like something goofed, ${
+        err.message.length < 1000
+          ? `\`${err.message}\``
+          : `but the error was too long, so heres the best i can do: \`${err.name}\``
+      }`
+    );
   });

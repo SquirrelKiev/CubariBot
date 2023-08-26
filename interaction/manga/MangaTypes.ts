@@ -55,20 +55,7 @@ export class Manga {
     deltaChapters: number,
     deltaPages: number
   ): Promise<ChapterState> {
-    let chapterKeysUnsorted: string[] = Object.keys(this.chapters).sort();
-
-    let numbers = chapterKeysUnsorted.filter(
-      (item) => !isNaN(parseFloat(item))
-    );
-    // not sure if this crops up but im not taking any chances
-    let nonNumbers = chapterKeysUnsorted.filter((item) =>
-      isNaN(parseFloat(item))
-    );
-
-    numbers.sort((a, b) => parseFloat(a) - parseFloat(b));
-    nonNumbers.sort();
-
-    let chapterKeys = [...numbers, ...nonNumbers];
+    let chapterKeys = this.getSortedChapterKeys();
 
     let chapterIndex = chapterKeys.findIndex(
       (chapter) => chapter === currentChapter
@@ -122,6 +109,23 @@ export class Manga {
       newChapter: chapterKeys[chapterIndex],
       newPage: newPage,
     };
+  }
+
+  getSortedChapterKeys() {
+    const chapterKeysUnsorted: string[] = Object.keys(this.chapters).sort();
+
+    let numbers = chapterKeysUnsorted.filter(
+      (item) => !isNaN(parseFloat(item))
+    );
+    // not sure if this crops up but im not taking any chances
+    const nonNumbers = chapterKeysUnsorted.filter((item) => isNaN(parseFloat(item))
+    );
+
+    numbers.sort((a, b) => parseFloat(a) - parseFloat(b));
+    nonNumbers.sort();
+
+    const chapterKeys = [...numbers, ...nonNumbers];
+    return chapterKeys;
   }
 }
 

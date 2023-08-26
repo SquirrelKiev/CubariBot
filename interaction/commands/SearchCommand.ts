@@ -3,18 +3,11 @@ import {
   CommandContext,
   SlashCreator,
   CommandOptionType,
-  EmbedField,
 } from "slash-create";
+import { SearchHandler } from "../search/SearchHandler";
+import { InteractionType, SearchState } from "../manga/InteractionIdSerializer";
 
-/* eslint-disable */
-import MFA from "mangadex-full-api";
-import { MangaNavigationHandler } from "../manga/MangaNavigationHandler";
-import { SeriesIdentifier } from "../manga/MangaTypes";
-import {
-  MangaInteractionType,
-  MangaNavigationStateParser,
-} from "../manga/MangaNavigationStateParser";
-import { config } from "../Config";
+
 
 export default class SearchCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -37,27 +30,12 @@ export default class SearchCommand extends SlashCommand {
   async run(ctx: CommandContext) {
     await ctx.defer();
 
-    const results = await MFA.Manga.search({
-        title: ctx.options["query"],
-        limit: config.mangadexPaginationLimit,
-        order: {
-            relevance: "desc"
-        }
-    });
+    const state: SearchState = {
+      interactionType: InteractionType.None,
+      query: ctx.options["query"],
+      offset: 0
+    }
 
-    let fields: EmbedField[] = results.map((manga): EmbedField => {
-        return {
-            name: manga.title,
-            value: "something cool"
-        };
-    })
-
-    ctx.send({
-      embeds: [
-        {
-          fields,
-        },
-      ],
-    });
+    ctx.send(await SearchHandler.getMessageContents(state));
   }
 }

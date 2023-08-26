@@ -4,7 +4,7 @@ import {
   SlashCreator,
   CommandOptionType,
 } from "slash-create";
-import { MangaInteractionType } from "../manga/MangaNavigationStateParser";
+import { InteractionType } from "../manga/InteractionIdSerializer";
 import { MangaNavigationHandler } from "../manga/MangaNavigationHandler";
 import { config } from "../Config";
 import { parseMangaUrl } from "../misc/ParseUrl";
@@ -20,18 +20,18 @@ export default class MangaCommand extends SlashCommand {
           type: CommandOptionType.STRING,
           name: "chapter",
           description: "Which chapter of the manga?",
-          required: true,
+          required: false,
         },
         {
           type: CommandOptionType.INTEGER,
           name: "page",
-          description: `Which page of that chapter? Default: Page ${config.defaultPage}`,
+          description: `Which page of that chapter?`,
           required: false,
         },
         {
           type: CommandOptionType.STRING,
           name: "url",
-          description: `The manga to get. Default: ${config.defaultManga}`,
+          description: `The manga to get. Will be the server's/channel's/user's default manga otherwise.`,
           required: false,
         },
       ],
@@ -57,11 +57,11 @@ export default class MangaCommand extends SlashCommand {
     }
 
     let chapter: string = ctx.options.chapter;
-    let page: number = ctx.options.page ?? config.defaultPage;
+    let page: number = ctx.options.page;
 
     ctx.send(
       await MangaNavigationHandler.getNewMessageContents({
-        interactionType: MangaInteractionType.None,
+        interactionType: InteractionType.Manga_Open,
         identifier: identifier,
         chapter: chapter,
         page: page,
