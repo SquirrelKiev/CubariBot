@@ -73,7 +73,7 @@ export class SearchHandler {
         : "No description.";
 
       fields.push({
-        name: title,
+        name: `${title}, by ${manga.author}`,
         value: description,
       });
 

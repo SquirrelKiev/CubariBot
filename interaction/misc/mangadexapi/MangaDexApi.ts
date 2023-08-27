@@ -34,7 +34,7 @@ export default class MangaDexApi {
   public static async search(
     query: Partial<GetSearchMangaParamsSchema>
   ): Promise<SearchResults> {
-    query.includes = [...query.includes, "author"];
+    query.includes = ["author"];
 
     const res = await axios.get(`${config.mangadexUrl}/manga`, {
       params: query,
