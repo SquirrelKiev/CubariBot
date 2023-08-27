@@ -1,3 +1,4 @@
+import axios from "axios";
 import { config } from "../Config";
 
 var chapterCache: Record<string, string[]> = {};
@@ -28,9 +29,7 @@ export class Manga {
   chapters: Record<string, Chapter>;
   series_name: string;
 
-  constructor(json: string, platform: string) {
-    let data: any = JSON.parse(json);
-
+  constructor(data: any, platform: string) {
     this.identifier = { platform, series: data.slug };
     this.title = data.title;
     this.description = data.description;
@@ -171,8 +170,8 @@ export class Chapter {
     srcs: string[]
   ): Promise<string[]> {
     if (typeof group === "string") {
-      let req = await fetch(config.cubariUrl + group);
-      srcs = await this.getImageSrcFromGroup(await req.json(), srcs);
+      let req = await axios.get(config.cubariUrl + group);
+      srcs = await this.getImageSrcFromGroup(await req.data, srcs);
     } else if (isStringArray(group)) {
       srcs = srcs.concat(group as string[]);
     } else {

@@ -9,7 +9,7 @@ export interface NavigateState {
 
 export interface SearchState {
   interactionType: InteractionType;
-  query: string;
+  query?: string;
   offset: number;
 }
 
@@ -21,14 +21,15 @@ export enum InteractionType {
   Manga_BackChapter,
   Manga_ForwardChapter,
   Manga_Open,
+  Search_SearchForManga,
   Search_BackPage,
   Search_ForwardPage,
   Search_SelectManga,
 }
 
 export class InteractionIdSerializer {
-  static encodeNavigate(info: NavigateState, uid: string): string {
-    let customIdString = `${info.interactionType}|${info.identifier.platform}|${info.identifier.series}|${info.chapter}|${info.page}|${uid}`;
+  static encodeMangaNavigate(state: NavigateState): string {
+    let customIdString = `${state.interactionType}|${state.identifier.platform}|${state.identifier.series}|${state.chapter}|${state.page}`;
 
     if (customIdString.length > 100) {
       throw new Error("customIdString exceeds 100 characters");
@@ -37,10 +38,10 @@ export class InteractionIdSerializer {
     return customIdString;
   }
 
-  static decodeNavigate(customIdString: string): NavigateState {
+  static decodeMangaNavigate(customIdString: string): NavigateState {
     let data = customIdString.split("|");
 
-    if (data.length !== 6) {
+    if (data.length !== 5) {
       throw new Error("Invalid customIdString format");
     }
 
@@ -55,8 +56,8 @@ export class InteractionIdSerializer {
     };
   }
 
-  static encodeSelect(mangaId: string, uid: string): string {
-    let customIdString = `${InteractionType.Search_SelectManga}|${mangaId}|${uid}`;
+  static encodeSearchSelect(mangaId: string): string {
+    let customIdString = `${InteractionType.Search_SelectManga}|${mangaId}`;
 
     if (customIdString.length > 100) {
       throw new Error("customIdString exceeds 100 characters");
@@ -65,14 +66,39 @@ export class InteractionIdSerializer {
     return customIdString;
   }
 
-  static decodeSelect(customIdString: string): string {
+  
+  static decodeSearchSelect(customIdString: string): string {
+    let data = customIdString.split("|");
+
+    if (data.length !== 2) {
+      throw new Error("Invalid customIdString format");
+    }
+
+    return data[1];
+  }
+
+  static encodeSearchNavigate(state: SearchState): string {
+    let customIdString = `${state.interactionType}|${state.query}|${state.offset}`
+    
+    if (customIdString.length > 100) {
+      throw new Error("customIdString exceeds 100 characters somehow");
+    }
+
+    return customIdString;
+  }
+  
+  static decodeSearchNavigate(customIdString: string): SearchState {
     let data = customIdString.split("|");
 
     if (data.length !== 3) {
       throw new Error("Invalid customIdString format");
     }
 
-    return data[1];
+    return {
+      interactionType: parseInt(data[0]),
+      query: data[1],
+      offset: parseInt(data[2])
+    };
   }
 
   static getInteractionType(customIdString: string): InteractionType {

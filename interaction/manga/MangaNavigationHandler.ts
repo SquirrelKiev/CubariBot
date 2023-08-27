@@ -14,7 +14,7 @@ import CubariApi from "../misc/CubariApi";
 
 export class MangaNavigationHandler {
   static async handleNavigationInteraction(ctx: ComponentContext) {
-    let state: NavigateState = InteractionIdSerializer.decodeNavigate(
+    let state: NavigateState = InteractionIdSerializer.decodeMangaNavigate(
       ctx.customID
     );
 
@@ -85,14 +85,13 @@ export class MangaNavigationHandler {
               type: ComponentType.BUTTON,
               style: ButtonStyle.PRIMARY,
               label: "<<",
-              custom_id: InteractionIdSerializer.encodeNavigate(
+              custom_id: InteractionIdSerializer.encodeMangaNavigate(
                 {
                   interactionType: InteractionType.Manga_BackChapter,
                   identifier: state.identifier,
                   page: page,
                   chapter: chapter,
-                },
-                "a"
+                }
               ),
               // emoji: {
               //   "name": "⏮️"
@@ -102,14 +101,13 @@ export class MangaNavigationHandler {
               type: ComponentType.BUTTON,
               style: ButtonStyle.PRIMARY,
               label: "<",
-              custom_id: InteractionIdSerializer.encodeNavigate(
+              custom_id: InteractionIdSerializer.encodeMangaNavigate(
                 {
                   interactionType: InteractionType.Manga_BackPage,
                   identifier: state.identifier,
                   page: page,
                   chapter: chapter,
                 },
-                "a"
               ),
               // emoji: {
               //   "name": "◀️"
@@ -119,14 +117,13 @@ export class MangaNavigationHandler {
               type: ComponentType.BUTTON,
               style: ButtonStyle.PRIMARY,
               label: ">",
-              custom_id: InteractionIdSerializer.encodeNavigate(
+              custom_id: InteractionIdSerializer.encodeMangaNavigate(
                 {
                   interactionType: InteractionType.Manga_ForwardPage,
                   identifier: state.identifier,
                   page: page,
                   chapter: chapter,
                 },
-                "a"
               ),
               // emoji: {
               //   "name": "▶️"
@@ -136,14 +133,13 @@ export class MangaNavigationHandler {
               type: ComponentType.BUTTON,
               style: ButtonStyle.PRIMARY,
               label: ">>",
-              custom_id: InteractionIdSerializer.encodeNavigate(
+              custom_id: InteractionIdSerializer.encodeMangaNavigate(
                 {
                   interactionType: InteractionType.Manga_ForwardChapter,
                   identifier: state.identifier,
                   page: page,
                   chapter: chapter,
                 },
-                "a"
               ),
               // emoji: {
               //   "name": "⏭️"

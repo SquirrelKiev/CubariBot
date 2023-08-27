@@ -1,5 +1,6 @@
 export const config = {
   cubariUrl: "https://cubari.moe",
+  mangadexUrl: "https://api.mangadex.org",
   defaultManga: "mangasee/Oshi-no-Ko",
   customPlatformHandling: [
     {

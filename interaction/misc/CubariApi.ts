@@ -1,9 +1,10 @@
+import axios from "axios";
 import { config } from "../Config";
 import { Chapter, Manga, SeriesIdentifier, getCacheKey } from "../manga/MangaTypes";
 
 export default class CubariApi {
   public static async getManga(identifier: SeriesIdentifier) {
-    let mangaGet: Response = await fetch(
+    let mangaGet = await axios.get(
       `${config.cubariUrl}/read/api/${encodeURIComponent(
         identifier.platform
       )}/series/${encodeURIComponent(identifier.series)}/`
@@ -13,7 +14,7 @@ export default class CubariApi {
       throw new Error(`${mangaGet.status} - assuming the manga doesnt exist?`);
     }
 
-    let manga: Manga = new Manga(await mangaGet.text(), identifier.platform);
+    let manga: Manga = new Manga(await mangaGet.data, identifier.platform);
 
     return manga;
   }

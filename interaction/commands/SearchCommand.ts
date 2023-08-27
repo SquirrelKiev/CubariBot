@@ -31,11 +31,11 @@ export default class SearchCommand extends SlashCommand {
     await ctx.defer();
 
     const state: SearchState = {
-      interactionType: InteractionType.None,
+      interactionType: InteractionType.Search_SearchForManga,
       query: ctx.options["query"],
       offset: 0
     }
 
-    ctx.send(await SearchHandler.getMessageContents(state));
+    ctx.send(await SearchHandler.getNewMessageContents(state));
   }
 }
