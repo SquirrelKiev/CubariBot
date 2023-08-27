@@ -1,7 +1,8 @@
 import axios from "axios";
 import { config } from "../Config";
+import { CubariChapterGroup, CubariChapterSchema, CubariMangaSchema } from "../misc/CubariSchema";
 
-var chapterCache: Record<string, string[]> = {};
+var chapterCache: Record<string, ChapterSrcs> = {};
 
 export interface ChapterState {
   newChapter: string;
@@ -11,6 +12,11 @@ export interface ChapterState {
 export interface SeriesIdentifier {
   platform: string;
   series: string;
+}
+
+export interface ChapterSrcs {
+  srcs: string[];
+  groupKey: string;
 }
 
 export class Manga {
@@ -29,7 +35,7 @@ export class Manga {
   chapters: Record<string, Chapter>;
   series_name: string;
 
-  constructor(data: any, platform: string) {
+  constructor(data: CubariMangaSchema, platform: string) {
     this.identifier = { platform, series: data.slug };
     this.title = data.title;
     this.description = data.description;
@@ -84,7 +90,7 @@ export class Manga {
         await this.chapters[chapterKeys[chapterIndex]].getImageSrcs(
           getCacheKey(this.identifier, chapterKeys[chapterIndex])
         )
-      ).length;
+      ).srcs.length;
 
       if (skipToEnd) {
         newPage = totalChapterPages;
@@ -95,7 +101,7 @@ export class Manga {
           await this.chapters[chapterKeys[chapterIndex]].getImageSrcs(
             getCacheKey(this.identifier, chapterKeys[chapterIndex])
           )
-        ).length;
+        ).srcs.length;
       } else if (newPage > totalChapterPages) {
         setChapterIndex(chapterIndex + 1);
         newPage -= totalChapterPages;
@@ -117,7 +123,8 @@ export class Manga {
       (item) => !isNaN(parseFloat(item))
     );
     // not sure if this crops up but im not taking any chances
-    const nonNumbers = chapterKeysUnsorted.filter((item) => isNaN(parseFloat(item))
+    const nonNumbers = chapterKeysUnsorted.filter((item) =>
+      isNaN(parseFloat(item))
     );
 
     numbers.sort((a, b) => parseFloat(a) - parseFloat(b));
@@ -132,11 +139,11 @@ export class Chapter {
   volume: string | null;
   title: string;
   slug: string;
-  groups: Record<string, string | string[] | Image[]>;
+  groups: Record<string, CubariChapterGroup>;
   release_date?: Record<string, number>;
   last_updated?: number;
 
-  constructor(data: any, slug: string) {
+  constructor(data: CubariChapterSchema, slug: string) {
     this.volume = data.volume;
     this.title = data.title;
     this.slug = slug;
@@ -145,33 +152,39 @@ export class Chapter {
     this.last_updated = data.last_updated;
   }
 
-  async getImageSrcs(cacheKey: string): Promise<string[]> {
+  async getImageSrcs(cacheKey: string): Promise<ChapterSrcs> {
     if (cacheKey in chapterCache) {
       return chapterCache[cacheKey];
     }
 
-    let groupKeys = Object.keys(this.groups);
+    const groupKeys = Object.keys(this.groups);
 
-    let srcs: string[] = [];
+    const group = this.groups[groupKeys[0]];
 
-    for (let x of groupKeys) {
-      let group = this.groups[x];
+    const srcs = await this.getImageSrcFromGroup(group);
 
-      srcs = await this.getImageSrcFromGroup(group, srcs);
+    const result: ChapterSrcs = {
+      srcs,
+      groupKey: groupKeys[0]
     }
 
-    chapterCache[cacheKey] = srcs;
+    chapterCache[cacheKey] = result;
 
-    return srcs;
+    return result;
   }
 
   async getImageSrcFromGroup(
-    group: string | string[] | Image[],
-    srcs: string[]
+    group: CubariChapterGroup
   ): Promise<string[]> {
+    let srcs: string[] = [];
+
     if (typeof group === "string") {
-      let req = await axios.get(config.cubariUrl + group);
-      srcs = await this.getImageSrcFromGroup(await req.data, srcs);
+      let req = await axios.get(config.cubariUrl + group, {
+        headers: {
+          "User-Agent": config.userAgent,
+        },
+      });
+      srcs = (await this.getImageSrcFromGroup(await req.data));
     } else if (isStringArray(group)) {
       srcs = srcs.concat(group as string[]);
     } else {

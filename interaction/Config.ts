@@ -10,6 +10,7 @@ export const config = {
   ],
   proxyUrl: process.env.PROXY_URL,
   mangadexPaginationLimit: 5,
+  userAgent: "Dibari/DiscordBot (https://github.com/SquirrelKiev/DibariBot)",
 
   // db
   dbName: "prefs",
