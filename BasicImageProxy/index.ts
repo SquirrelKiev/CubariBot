@@ -14,6 +14,8 @@ const httpTrigger: AzureFunction = async function (
       "Content-Type": response.contentType
     }
   }
+
+  context.res = responseMapped;
 };
 
 export default httpTrigger;

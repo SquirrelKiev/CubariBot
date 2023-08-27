@@ -42,7 +42,7 @@ export default async function proxy(url: string): Promise<ProxyResult> {
       },
     });
 
-    const contentLength = response.headers["Content-Length"];
+    const contentLength = response.headers["content-length"];
     if (contentLength && Number(contentLength) > config.maxImageSize) {
       return {
         ...defaultResponse,
@@ -53,13 +53,13 @@ export default async function proxy(url: string): Promise<ProxyResult> {
 
     const buffer = Buffer.from(response.data);
 
-    const contentType = response.headers["Content-Type"];
+    const contentType = response.headers["content-type"];
 
     // shh compiler
     if (typeof contentType !== "string") {
       return {
         ...defaultResponse,
-        status: 500,
+        status: 400,
         body: "Invalid content type received.",
       };
     }
