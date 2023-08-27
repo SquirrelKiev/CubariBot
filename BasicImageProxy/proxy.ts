@@ -1,3 +1,4 @@
+import axios from "axios";
 import { config } from "./Config";
 
 interface ProxyResult {
@@ -30,17 +31,14 @@ export default async function proxy(url: string): Promise<ProxyResult> {
     };
   }
 
-  // for timeouts
-  const controller = new AbortController();
-  const signal = controller.signal;
-  const timeoutId = setTimeout(() => controller.abort(), config.timeout);
-
   try {
-    const response = await fetch(url, { signal });
+    const response = await axios.get(url, {
+      responseType: "arraybuffer",
+      timeout: config.timeout,
+      validateStatus: (status) => true,
+    });
 
-    clearTimeout(timeoutId);
-
-    const contentLength = response.headers.get("content-length");
+    const contentLength = response.headers["Content-Length"];
     if (contentLength && Number(contentLength) > config.maxImageSize) {
       return {
         ...defaultResponse,
@@ -49,10 +47,19 @@ export default async function proxy(url: string): Promise<ProxyResult> {
       };
     }
 
-    const imageBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(imageBuffer);
+    const buffer = Buffer.from(response.data);
 
-    const contentType = response.headers.get("content-type");
+    const contentType = response.headers["Content-Type"];
+
+    // shh compiler
+    if (typeof contentType !== 'string') {
+      return {
+          ...defaultResponse,
+          status: 500,
+          body: "Invalid content type received.",
+      };
+  }
+
     if (!contentType || !contentType.startsWith("image")) {
       return {
         ...defaultResponse,
@@ -67,7 +74,7 @@ export default async function proxy(url: string): Promise<ProxyResult> {
       contentType: contentType,
     };
   } catch (err) {
-    if (err.name === "AbortError") {
+    if (err.code === "ECONNABORTED") {
       return {
         ...defaultResponse,
         status: 408,
