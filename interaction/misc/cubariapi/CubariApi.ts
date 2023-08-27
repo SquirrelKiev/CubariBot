@@ -1,12 +1,12 @@
 import axios from "axios";
-import { config } from "../Config";
+import { config } from "../../Config";
 import {
   Chapter,
   ChapterSrcs,
   Manga,
   SeriesIdentifier,
   getCacheKey,
-} from "../manga/MangaTypes";
+} from "../../manga/MangaTypes";
 
 export default class CubariApi {
   public static async getManga(identifier: SeriesIdentifier) {
@@ -16,8 +16,8 @@ export default class CubariApi {
       )}/series/${encodeURIComponent(identifier.series)}/`,
       {
         headers: {
-          "User-Agent": config.userAgent
-        }
+          "User-Agent": config.userAgent,
+        },
       }
     );
 

@@ -9,6 +9,7 @@ import {
   MangaResponseSchema,
   MangaSchema,
 } from "./Schema";
+import CacheManager from "../CacheManager";
 
 // TODO: handle api limits (we arent hitting them rn so not my problem)
 
@@ -27,7 +28,7 @@ export interface SearchResults {
 }
 
 // TODO: Put in config
-const preferredLanguages = ["en"];
+const PREFERRED_LANGUAGES = ["en", "jp"];
 
 export default class MangaDexApi {
   public static async search(
@@ -57,20 +58,30 @@ export default class MangaDexApi {
   }
 
   public static async getMangaById(id: string): Promise<MangaDexManga> {
+    const cache = CacheManager.getCache("mangadex.getmangabyid");
+
+    if (cache.has(id)) {
+      return cache.get(id);
+    }
+
     const query: Partial<GetMangaIdParamsSchema> = {
       includes: ["author"],
     };
 
-    const res = await axios.get(`${config.mangadexUrl}/manga/${id}`, {
+    const apiResult = await axios.get(`${config.mangadexUrl}/manga/${id}`, {
       params: query,
       headers: {
         "User-Agent": config.userAgent,
       },
     });
 
-    const responseData: MangaResponseSchema = res.data;
+    const responseData: MangaResponseSchema = apiResult.data;
 
-    return this.mapMangaSchema(responseData.data);
+    const result = this.mapMangaSchema(responseData.data);
+
+    cache.set(id, result);
+
+    return result;
   }
 
   private static mapMangaSchema(manga: MangaSchema): MangaDexManga {
@@ -89,7 +100,7 @@ export default class MangaDexApi {
   }
 
   private static getLocalizedString(data: LocalizedStringSchema): string {
-    for (const lang of preferredLanguages) {
+    for (const lang of PREFERRED_LANGUAGES) {
       if (data[lang]) return data[lang];
     }
 

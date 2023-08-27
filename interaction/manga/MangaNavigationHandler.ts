@@ -10,7 +10,7 @@ import {
   InteractionIdSerializer,
 } from "./InteractionIdSerializer";
 import { ChapterState } from "./MangaTypes";
-import CubariApi from "../misc/CubariApi";
+import CubariApi from "../misc/cubariapi/CubariApi";
 import MangaDexApi from "../misc/mangadexapi/MangaDexApi";
 
 export class MangaNavigationHandler {

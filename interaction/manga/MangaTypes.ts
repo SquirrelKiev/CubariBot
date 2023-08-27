@@ -1,8 +1,11 @@
 import axios from "axios";
 import { config } from "../Config";
-import { CubariChapterGroup, CubariChapterSchema, CubariMangaSchema } from "../misc/CubariSchema";
-
-var chapterCache: Record<string, ChapterSrcs> = {};
+import {
+  CubariChapterGroup,
+  CubariChapterSchema,
+  CubariMangaSchema,
+} from "../misc/cubariapi/CubariSchema";
+import CacheManager from "../misc/CacheManager";
 
 export interface ChapterState {
   newChapter: string;
@@ -153,8 +156,10 @@ export class Chapter {
   }
 
   async getImageSrcs(cacheKey: string): Promise<ChapterSrcs> {
-    if (cacheKey in chapterCache) {
-      return chapterCache[cacheKey];
+    const chapterCache = CacheManager.getCache("manga.imagesrcs");
+
+    if (chapterCache.has(cacheKey)) {
+      return chapterCache.get(cacheKey);
     }
 
     const groupKeys = Object.keys(this.groups);
@@ -165,26 +170,25 @@ export class Chapter {
 
     const result: ChapterSrcs = {
       srcs,
-      groupKey: groupKeys[0]
-    }
+      groupKey: groupKeys[0],
+    };
 
-    chapterCache[cacheKey] = result;
+    chapterCache.set(cacheKey, result);
 
     return result;
   }
 
-  async getImageSrcFromGroup(
-    group: CubariChapterGroup
-  ): Promise<string[]> {
+  async getImageSrcFromGroup(group: CubariChapterGroup): Promise<string[]> {
     let srcs: string[] = [];
 
     if (typeof group === "string") {
+      // TODO: Move to CubariApi
       let req = await axios.get(config.cubariUrl + group, {
         headers: {
           "User-Agent": config.userAgent,
         },
       });
-      srcs = (await this.getImageSrcFromGroup(await req.data));
+      srcs = await this.getImageSrcFromGroup(await req.data);
     } else if (isStringArray(group)) {
       srcs = srcs.concat(group as string[]);
     } else {
