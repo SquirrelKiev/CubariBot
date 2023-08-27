@@ -13,7 +13,7 @@ export default class SearchCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
       name: "search",
-      description: "Gets a page from a chapter of a manga.",
+      description: "Searches MangaDex for the query provided. (searches titles, sorted by relevance.)",
       options: [
         {
           type: CommandOptionType.STRING,
