@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/local.settings.json",
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "DISCORD_APP_ID": "APPID",
+    "DISCORD_PUBLIC_KEY": "PUBKEY",
+    "DISCORD_BOT_TOKEN": "TOKEN",
+    "MONGODB_CONNECTION_STRING": "mongodb://example.com:27017",
+    "PROXY_URL": "https://example.com/api/proxy.png?url="
+  }
+}
