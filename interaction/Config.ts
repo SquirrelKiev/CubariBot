@@ -16,7 +16,7 @@ export const config = {
 
   // styling
   defaultButtonStyle: ButtonStyle.SECONDARY as ButtonStyle.PRIMARY | ButtonStyle.SECONDARY | ButtonStyle.SUCCESS | ButtonStyle.DESTRUCTIVE,
-  embedColor: 0xFFFFFF,
+  embedColor: 0xFFC0CB,
   invalidLinkError: "Unsupported/invalid URL. Please make sure you're using a link that is supported by Cubari.",
   
   // db
