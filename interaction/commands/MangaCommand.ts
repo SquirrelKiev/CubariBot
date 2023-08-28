@@ -54,6 +54,7 @@ export default class MangaCommand extends SlashCommand {
 
     if (!identifier) {
       ctx.send("Invalid URL.");
+      return;
     }
 
     let chapter: string = ctx.options.chapter;
