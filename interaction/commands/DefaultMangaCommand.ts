@@ -77,6 +77,12 @@ export default class DefaultMangaCommand extends SlashCommand {
 
     let result = null;
     let url: string | null = ctx.options[ctx.subcommands[0]]["url"];
+
+    if (!ctx.member.permissions.any(1 << 5) && url && ctx.subcommands[0] !== "user") {
+      ctx.send("No permission.");
+      return;
+    }
+
     let set: boolean = false;
 
     if (url && url !== "none") {
@@ -165,7 +171,7 @@ export default class DefaultMangaCommand extends SlashCommand {
       let modifiedValue = value === "none" ? null : value;
 
       await typeFunctionMap[type].set(id, { [key]: modifiedValue });
-      return value;
+      return modifiedValue;
     } else {
       if (key in prefs && prefs[key] !== null) {
         return prefs[key];

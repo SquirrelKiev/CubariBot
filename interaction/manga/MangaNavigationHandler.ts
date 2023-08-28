@@ -13,6 +13,7 @@ import { ChapterState } from "./MangaTypes";
 import CubariApi from "../misc/cubariapi/CubariApi";
 import MangaDexApi from "../misc/mangadexapi/MangaDexApi";
 import { truncate } from "../misc/MiscUtility";
+import { config } from "../Config";
 
 export class MangaNavigationHandler {
   static async handleNavigationInteraction(ctx: ComponentContext) {
@@ -81,6 +82,7 @@ export class MangaNavigationHandler {
     return {
       embeds: [
         {
+          color: config.embedColor,
           title: chapterData.title || `Chapter ${chapter}`,
           url: manga.getCubariUrl(chapter, page),
           description: `Chapter ${chapter} | Page ${page}/${pages.srcs.length}`,
@@ -102,7 +104,7 @@ export class MangaNavigationHandler {
           components: [
             {
               type: ComponentType.BUTTON,
-              style: ButtonStyle.PRIMARY,
+              style: config.defaultButtonStyle,
               label: "<<",
               custom_id: InteractionIdSerializer.encodeMangaNavigate({
                 interactionType: InteractionType.Manga_BackChapter,
@@ -117,7 +119,7 @@ export class MangaNavigationHandler {
             },
             {
               type: ComponentType.BUTTON,
-              style: ButtonStyle.PRIMARY,
+              style: config.defaultButtonStyle,
               label: "<",
               custom_id: InteractionIdSerializer.encodeMangaNavigate({
                 interactionType: InteractionType.Manga_BackPage,
@@ -132,7 +134,7 @@ export class MangaNavigationHandler {
             },
             {
               type: ComponentType.BUTTON,
-              style: ButtonStyle.PRIMARY,
+              style: config.defaultButtonStyle,
               label: ">",
               custom_id: InteractionIdSerializer.encodeMangaNavigate({
                 interactionType: InteractionType.Manga_ForwardPage,
@@ -147,7 +149,7 @@ export class MangaNavigationHandler {
             },
             {
               type: ComponentType.BUTTON,
-              style: ButtonStyle.PRIMARY,
+              style: config.defaultButtonStyle,
               label: ">>",
               custom_id: InteractionIdSerializer.encodeMangaNavigate({
                 interactionType: InteractionType.Manga_ForwardChapter,

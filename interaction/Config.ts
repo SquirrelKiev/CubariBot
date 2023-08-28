@@ -1,3 +1,5 @@
+import { ButtonStyle } from "slash-create";
+
 export const config = {
   cubariUrl: "https://cubari.moe",
   mangadexUrl: "https://api.mangadex.org",
@@ -11,6 +13,10 @@ export const config = {
   proxyUrl: process.env.PROXY_URL,
   mangadexPaginationLimit: 5,
   userAgent: "Dibari/DiscordBot (https://github.com/SquirrelKiev/DibariBot)",
+
+  // styling
+  defaultButtonStyle: ButtonStyle.SECONDARY as ButtonStyle.PRIMARY | ButtonStyle.SECONDARY | ButtonStyle.SUCCESS | ButtonStyle.DESTRUCTIVE,
+  embedColor: 0xFFFFFF,
 
   // db
   dbName: "prefs",

@@ -89,6 +89,7 @@ export class SearchHandler {
     return {
       embeds: [
         {
+          color: config.embedColor,
           fields,
           footer: {
             text: `Page ${currentPage}/${totalPages} - ${results.total} results`,
@@ -112,7 +113,7 @@ export class SearchHandler {
           components: [
             {
               type: ComponentType.BUTTON,
-              style: ButtonStyle.PRIMARY,
+              style: config.defaultButtonStyle,
               custom_id: InteractionIdSerializer.encodeSearchNavigate({
                 interactionType: InteractionType.Search_BackPage,
                 query: state.query,
@@ -123,7 +124,7 @@ export class SearchHandler {
             },
             {
               type: ComponentType.BUTTON,
-              style: ButtonStyle.PRIMARY,
+              style: config.defaultButtonStyle,
               custom_id: InteractionIdSerializer.encodeSearchNavigate({
                 interactionType: InteractionType.Search_ForwardPage,
                 query: state.query,
