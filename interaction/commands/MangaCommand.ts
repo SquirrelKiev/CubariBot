@@ -52,8 +52,8 @@ export default class MangaCommand extends SlashCommand {
         ))
     );
 
-    if (!identifier) {
-      ctx.send("Invalid URL.");
+    if (!identifier || identifier.platform === null || identifier.series === null) {
+      ctx.send(config.invalidLinkError);
       return;
     }
 
