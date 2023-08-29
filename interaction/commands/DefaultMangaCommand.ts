@@ -6,13 +6,14 @@ import {
 } from "slash-create";
 import { DbManager } from "../database/DbManager";
 import { parseMangaUrl } from "../misc/ParseUrl";
+import { DibariSlashCommand } from "../misc/DibariSlashCommand";
 
-export default class DefaultMangaCommand extends SlashCommand {
+export default class DefaultMangaCommand extends DibariSlashCommand {
   private dbManager: DbManager;
 
   constructor(creator: SlashCreator) {
     super(creator, {
-      name: "default-manga",
+      name: "manga-default",
       description: "Gets the current default manga.",
       options: [
         {
@@ -63,6 +64,10 @@ export default class DefaultMangaCommand extends SlashCommand {
       ],
     });
 
+    this.longDescription =
+      "Sets the server, channel, or user's default manga. " + 
+      "This is the manga that appears when `/manga` is run without a url argument. to reset back to default, set the default url to `none`.";
+
     this.filePath = __filename;
     this.dbManager = DbManager.getInstance();
   }
@@ -78,7 +83,11 @@ export default class DefaultMangaCommand extends SlashCommand {
     let result = null;
     let url: string | null = ctx.options[ctx.subcommands[0]]["url"];
 
-    if (!ctx.member.permissions.any(1 << 5) && url && ctx.subcommands[0] !== "user") {
+    if (
+      !ctx.member.permissions.any(1 << 5) &&
+      url &&
+      ctx.subcommands[0] !== "user"
+    ) {
       ctx.send("No permission.");
       return;
     }

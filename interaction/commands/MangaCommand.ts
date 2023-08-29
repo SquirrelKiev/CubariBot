@@ -9,8 +9,9 @@ import { MangaNavigationHandler } from "../manga/MangaNavigationHandler";
 import { config } from "../Config";
 import { parseMangaUrl } from "../misc/ParseUrl";
 import { DbManager } from "../database/DbManager";
+import { DibariSlashCommand } from "../misc/DibariSlashCommand";
 
-export default class MangaCommand extends SlashCommand {
+export default class MangaCommand extends DibariSlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
       name: "manga",
@@ -38,6 +39,8 @@ export default class MangaCommand extends SlashCommand {
     });
 
     this.filePath = __filename;
+    this.longDescription = "Gets a page from a chapter of a manga. " + 
+    "URL can be any supported link supported by cubari, plus cubari.moe links, plus a custom format of `platform/series`, e.g. `mangasee/Oshi-no-Ko`.";
   }
 
   async run(ctx: CommandContext) {

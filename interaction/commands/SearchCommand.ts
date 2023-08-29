@@ -6,13 +6,14 @@ import {
 } from "slash-create";
 import { SearchHandler } from "../search/SearchHandler";
 import { InteractionType, SearchState } from "../manga/InteractionIdSerializer";
+import { DibariSlashCommand } from "../misc/DibariSlashCommand";
 
 
 
-export default class SearchCommand extends SlashCommand {
+export default class SearchCommand extends DibariSlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
-      name: "search",
+      name: "manga-search",
       description: "Searches MangaDex for the query provided. (searches titles, sorted by relevance.)",
       options: [
         {
@@ -24,6 +25,7 @@ export default class SearchCommand extends SlashCommand {
       ],
     });
 
+    this.longDescription = "Searches MangaDex for the query provided. Is sorted the same way MangaDex sorts in their website (relevance, descending).";
     this.filePath = __filename;
   }
 
