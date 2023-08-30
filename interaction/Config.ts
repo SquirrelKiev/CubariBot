@@ -15,10 +15,15 @@ export const config = {
   userAgent: "Dibari/DiscordBot (https://github.com/SquirrelKiev/DibariBot)",
 
   // styling
-  defaultButtonStyle: ButtonStyle.SECONDARY as ButtonStyle.PRIMARY | ButtonStyle.SECONDARY | ButtonStyle.SUCCESS | ButtonStyle.DESTRUCTIVE,
-  embedColor: 0xfBEED9,
-  invalidLinkError: "Unsupported/invalid URL. Please make sure you're using a link that is supported by Cubari.",
-  
+  defaultButtonStyle: ButtonStyle.SECONDARY as
+    | ButtonStyle.PRIMARY
+    | ButtonStyle.SECONDARY
+    | ButtonStyle.SUCCESS
+    | ButtonStyle.DESTRUCTIVE,
+  embedColor: 0xfbeed9,
+  invalidLinkError:
+    "Unsupported/invalid URL. Please make sure you're using a link that is supported by Cubari.",
+
   // db
   dbName: "prefs",
   guildPrefsCol: "guild-prefs",
@@ -32,5 +37,10 @@ export const config = {
       }
     }
     return false;
+  },
+
+  // for the "super secret debug" command
+  getBotOwners(): string[] {
+    return process.env.BOT_OWNERS.split(',');
   },
 };

@@ -9,5 +9,6 @@
     "DISCORD_BOT_TOKEN": "TOKEN",
     "MONGODB_CONNECTION_STRING": "mongodb://example.com:27017",
     "PROXY_URL": "https://example.com/api/proxy.png?url="
+    "BOT_OWNERS": "USER_ID1,USER_ID2,etc"
   }
 }

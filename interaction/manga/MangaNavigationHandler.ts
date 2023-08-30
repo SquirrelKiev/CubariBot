@@ -8,7 +8,7 @@ import {
   InteractionType as InteractionType,
   NavigateState,
   InteractionIdSerializer,
-} from "./InteractionIdSerializer";
+} from "../misc/InteractionIdSerializer";
 import { ChapterState } from "./MangaTypes";
 import CubariApi from "../misc/cubariapi/CubariApi";
 import MangaDexApi from "../misc/mangadexapi/MangaDexApi";

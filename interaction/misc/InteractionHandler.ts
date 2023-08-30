@@ -2,9 +2,11 @@ import { ComponentContext, ComponentType } from "slash-create";
 import {
   InteractionType,
   InteractionIdSerializer,
-} from "../manga/InteractionIdSerializer";
+  DebugPageType,
+} from "./InteractionIdSerializer";
 import { MangaNavigationHandler } from "../manga/MangaNavigationHandler";
 import { SearchHandler } from "../search/SearchHandler";
+import { DebugCommandHandler } from "./DebugCommandHandler";
 
 export default async function interactionHandler(ctx: ComponentContext) {
   if (ctx.message.interaction.user.id !== ctx.user.id) {
@@ -60,6 +62,29 @@ export default async function interactionHandler(ctx: ComponentContext) {
     case InteractionType.Search_BackPage:
     case InteractionType.Search_ForwardPage:
       await SearchHandler.handleNavigationInteraction(ctx);
+      break;
+
+    case InteractionType.Debug_SwitchPage:
+      ctx.editParent(
+        await DebugCommandHandler.run(
+          InteractionIdSerializer.decodeDebugSwitchPage(id),
+          ctx.user.id
+        )
+      );
+      break;
+
+    case InteractionType.Debug_ClearCache:
+      await DebugCommandHandler.clearCache();
+
+      ctx.editParent(
+        await DebugCommandHandler.run(
+          {
+            interactionType: InteractionType.Debug_SwitchPage,
+            page: DebugPageType.Cache,
+          },
+          ctx.user.id
+        )
+      );
       break;
 
     case InteractionType.Close:

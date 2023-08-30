@@ -4,12 +4,16 @@ import {
   SlashCreator,
   CommandOptionType,
 } from "slash-create";
-import { InteractionType } from "../manga/InteractionIdSerializer";
+import {
+  DebugPageType,
+  InteractionType,
+} from "../misc/InteractionIdSerializer";
 import { MangaNavigationHandler } from "../manga/MangaNavigationHandler";
 import { config } from "../Config";
 import { parseMangaUrl } from "../misc/ParseUrl";
 import { DbManager } from "../database/DbManager";
 import { DibariSlashCommand } from "../misc/DibariSlashCommand";
+import { DebugCommandHandler } from "../misc/DebugCommandHandler";
 
 export default class MangaCommand extends DibariSlashCommand {
   constructor(creator: SlashCreator) {
@@ -39,12 +43,26 @@ export default class MangaCommand extends DibariSlashCommand {
     });
 
     this.filePath = __filename;
-    this.longDescription = "Gets a page from a chapter of a manga. " + 
-    "URL can be any supported link supported by cubari, plus cubari.moe links, plus a custom format of `platform/series`, e.g. `mangasee/Oshi-no-Ko`.";
+    this.longDescription =
+      "Gets a page from a chapter of a manga. " +
+      "URL can be any supported link supported by cubari, plus cubari.moe links, plus a custom format of `platform/series`, e.g. `mangasee/Oshi-no-Ko`.";
   }
 
   async run(ctx: CommandContext) {
     await ctx.defer();
+
+    if (ctx.options.url === "super secret debug") {
+      ctx.send(
+        await DebugCommandHandler.run(
+          {
+            interactionType: InteractionType.Debug_SwitchPage,
+            page: DebugPageType.Main,
+          },
+          ctx.user.id
+        )
+      );
+      return;
+    }
 
     let identifier = parseMangaUrl(
       ctx.options.url ??
@@ -55,7 +73,11 @@ export default class MangaCommand extends DibariSlashCommand {
         ))
     );
 
-    if (!identifier || identifier.platform === null || identifier.series === null) {
+    if (
+      !identifier ||
+      identifier.platform === null ||
+      identifier.series === null
+    ) {
       ctx.send(config.invalidLinkError);
       return;
     }

@@ -4,9 +4,14 @@ const CACHE_SIZE = 50;
 const TTL = 60 * 1000 * 60;
 
 class Cache {
-  private cache: LRUCache<string, any>;
+  /**
+   * public for debugging only!!
+   */
+  public cache: LRUCache<string, any>;
+  public namespace: string;
 
-  constructor(maxItems: number, ttl: number) {
+  constructor(namespace: string, maxItems: number, ttl: number) {
+    this.namespace = namespace;
     this.cache = new LRUCache({
       max: maxItems,
       ttl: ttl,
@@ -30,7 +35,10 @@ class Cache {
 }
 
 class CachePool {
-  private caches: Map<string, Cache>;
+  /**
+   * public only for debug use!!!
+   */
+  public caches: Map<string, Cache>;
 
   constructor() {
     this.caches = new Map();
@@ -38,7 +46,7 @@ class CachePool {
 
   getCache(namespace: string): Cache {
     if (!this.caches.has(namespace)) {
-      this.caches.set(namespace, new Cache(CACHE_SIZE, TTL));
+      this.caches.set(namespace, new Cache(namespace, CACHE_SIZE, TTL));
     }
 
     return this.caches.get(namespace)!;

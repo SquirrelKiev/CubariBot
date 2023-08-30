@@ -5,7 +5,7 @@ import {
   CommandOptionType,
 } from "slash-create";
 import { SearchHandler } from "../search/SearchHandler";
-import { InteractionType, SearchState } from "../manga/InteractionIdSerializer";
+import { InteractionType, SearchState } from "../misc/InteractionIdSerializer";
 import { DibariSlashCommand } from "../misc/DibariSlashCommand";
 
 

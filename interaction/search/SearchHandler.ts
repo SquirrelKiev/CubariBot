@@ -2,7 +2,7 @@ import {
   InteractionIdSerializer,
   InteractionType,
   SearchState,
-} from "../manga/InteractionIdSerializer";
+} from "../misc/InteractionIdSerializer";
 import { config } from "../Config";
 import {
   ButtonStyle,
