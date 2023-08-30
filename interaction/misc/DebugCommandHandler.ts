@@ -22,10 +22,10 @@ export class DebugCommandHandler {
     state: DebugSwitchPageState,
     userId: string
   ): Promise<MessageOptions> {
-    if(!config.getBotOwners().includes(userId)){
+    if (!config.getBotOwners().includes(userId)) {
       return {
-        content: "No permission."
-      }
+        content: "No permission.",
+      };
     }
 
     switch (state.page) {
@@ -33,6 +33,7 @@ export class DebugCommandHandler {
         return {
           embeds: [
             {
+              color: config.embedColor,
               fields: [
                 {
                   name: "Instance Started",
@@ -46,7 +47,9 @@ export class DebugCommandHandler {
                 },
                 {
                   name: "Memory Usage",
-                  value: `\`${Math.round(process.memoryUsage().rss / 1000000)} MB\``,
+                  value: `\`${Math.round(
+                    process.memoryUsage().rss / 1000000
+                  )} MB\``,
                   inline: true,
                 },
               ],
@@ -92,13 +95,14 @@ export class DebugCommandHandler {
           fields.push({
             name: element.namespace,
             value: `${element.cache.size}/${element.cache.max} element(s)`,
-            inline: true
+            inline: true,
           });
         });
 
         return {
           embeds: [
             {
+              color: config.embedColor,
               title: `Current Cache Groups: ${CacheManager.caches.size}`,
               fields: fields,
             },
@@ -140,8 +144,8 @@ export class DebugCommandHandler {
                   type: ComponentType.BUTTON,
                   style: ButtonStyle.DESTRUCTIVE,
                   label: "Clear",
-                  custom_id: `${InteractionType.Debug_ClearCache}`
-                }
+                  custom_id: `${InteractionType.Debug_ClearCache}`,
+                },
               ],
             },
           ],
